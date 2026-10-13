@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.ipynb_checkpoints/
+
+# Data, checkpoints and run outputs stay out of git
+data/raw/
+data/processed/
+outputs/
+*.pt
+*.pth
+*.ckpt
+
+# Secrets
+kaggle.json
+.env

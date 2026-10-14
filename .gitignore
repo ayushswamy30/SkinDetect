@@ -6,7 +6,9 @@ __pycache__/
 
 # Data, checkpoints and run outputs stay out of git
 data/raw/
-data/processed/
+data/processed/*
+# ...except the split files, so every experiment uses the exact same folds
+!data/processed/*.csv
 outputs/
 *.pt
 *.pth

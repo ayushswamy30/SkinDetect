@@ -4,7 +4,7 @@ Prints split sizes, class weights and the class mix produced by the balanced sam
 training loader, and saves augmented and validation image grids to outputs/preview/.
 
 Usage:
-    uv run python scripts/preview_batch.py [--fold 0] [--img-size 224] [--workers 4]
+    uv run python scripts/preview_batch.py [--fold 0] [--img-size 224] [--workers 4] [--cache 300]
 """
 
 import argparse
@@ -61,10 +61,13 @@ def main() -> None:
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--time-batches", type=int, default=30)
+    parser.add_argument("--cache", type=int, default=None, metavar="SHORT_SIDE",
+                        help="read downscaled images built by scripts/resize_images.py")
     args = parser.parse_args()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    train_loader, val_loader = build_loaders(args.fold, args.img_size, args.batch_size, args.workers)
+    train_loader, val_loader = build_loaders(args.fold, args.img_size, args.batch_size, args.workers,
+                                             cache_short_side=args.cache)
     train_labels = train_loader.dataset.labels
     val_labels = val_loader.dataset.labels
     print(f"Fold {args.fold}: {len(train_labels):,} train / {len(val_labels):,} val images")

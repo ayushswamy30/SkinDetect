@@ -1,0 +1,31 @@
+# Baseline: ImageNet-pretrained EfficientNet-B0 at 224px, class-weighted cross-entropy.
+# Sized for a 6 GB laptop GPU (peak ~1.5 GB) and ~30 s per epoch.
+name: baseline
+seed: 42
+
+data:
+  val_fold: 0            # train on the other four folds
+  img_size: 224
+  cache_short_side: 300  # downscaled copies from scripts/resize_images.py; null = original images
+  batch_size: 32
+  num_workers: 6
+  sampler_power: 0.0     # >0 oversamples rare classes (1 = equal share); 0 = plain shuffling
+
+model:
+  name: efficientnet_b0  # any timm model name
+  pretrained: true
+  drop_rate: 0.2
+  drop_path_rate: 0.1
+
+loss:
+  class_weight_power: 0.5  # inverse-frequency weights ** power; 0 = unweighted
+  label_smoothing: 0.0
+
+optim:
+  lr: 3.0e-4
+  weight_decay: 0.01
+  epochs: 25
+  warmup_epochs: 1       # linear warm-up, then cosine decay to 1% of lr
+
+train:
+  amp: true              # bfloat16 autocast

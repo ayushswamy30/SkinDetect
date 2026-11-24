@@ -31,6 +31,11 @@ CLASS_NAMES = {
 MALIGNANT = {"akiec", "bcc", "mel"}
 
 
+def resized_image_dir(image_dir: Path, short_side: int | None) -> Path:
+    """Where scripts/resize_images.py caches downscaled copies of `image_dir`; None means the originals."""
+    return image_dir if short_side is None else PROCESSED_DIR / f"{image_dir.name}_{short_side}"
+
+
 def load_metadata() -> pd.DataFrame:
     """HAM10000 training metadata with image paths and integer labels."""
     df = pd.read_csv(RAW_DIR / "HAM10000_metadata.csv")

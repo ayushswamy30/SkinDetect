@@ -9,7 +9,7 @@ from PIL import Image
 from torch.utils.data import DataLoader, Dataset, WeightedRandomSampler
 from torchvision.transforms import v2
 
-from skinlesion.data import CLASSES, FOLDS_CSV, TEST_CSV, TEST_IMAGE_DIR, TRAIN_IMAGE_DIR
+from skinlesion.data import CLASSES, FOLDS_CSV, TEST_CSV, TEST_IMAGE_DIR, TRAIN_IMAGE_DIR, resized_image_dir
 
 IMAGENET_MEAN = (0.485, 0.456, 0.406)
 IMAGENET_STD = (0.229, 0.224, 0.225)
@@ -50,7 +50,8 @@ def build_transforms(img_size: int, train: bool) -> v2.Compose:
         v2.RandomResizedCrop(img_size, scale=(0.4, 1.0), ratio=(0.75, 4 / 3), antialias=True),
         v2.RandomHorizontalFlip(),
         v2.RandomVerticalFlip(),
-        v2.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.02),
+        # No hue jitter: it is the slowest CPU augmentation and lesion colour carries diagnostic signal
+        v2.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
         *to_tensor,
     ])
 
@@ -100,31 +101,49 @@ def balanced_sampler(labels: Sequence[int], power: float = 0.5, seed: int = 0) -
                                  replacement=True, generator=generator)
 
 
+def image_dir_for(base_dir, cache_short_side: int | None):
+    """The cached downscaled image folder if requested, failing loudly when it hasn't been built yet."""
+    path = resized_image_dir(base_dir, cache_short_side)
+    if not path.exists():
+        raise FileNotFoundError(f"{path} not found; run: uv run python scripts/resize_images.py "
+                                f"--short-side {cache_short_side}")
+    return path
+
+
 def build_loaders(val_fold: int = 0, img_size: int = 224, batch_size: int = 32, num_workers: int = 4,
-                  sampler_power: float = 0.0, seed: int = 0) -> tuple[DataLoader, DataLoader]:
+                  sampler_power: float = 0.0, seed: int = 0,
+                  cache_short_side: int | None = None) -> tuple[DataLoader, DataLoader]:
     """Train and validation loaders for one cross-validation fold.
 
     sampler_power > 0 switches the training loader from shuffling to class-balanced oversampling.
+    cache_short_side reads the downscaled copies from scripts/resize_images.py instead of the originals.
     """
     train_df, val_df = split_fold(load_folds(), val_fold)
-    train_ds = SkinLesionDataset(train_df, TRAIN_IMAGE_DIR, build_transforms(img_size, train=True))
-    val_ds = SkinLesionDataset(val_df, TRAIN_IMAGE_DIR, build_transforms(img_size, train=False))
+    image_dir = image_dir_for(TRAIN_IMAGE_DIR, cache_short_side)
+    train_ds = SkinLesionDataset(train_df, image_dir, build_transforms(img_size, train=True))
+    val_ds = SkinLesionDataset(val_df, image_dir, build_transforms(img_size, train=False))
 
-    common = dict(batch_size=batch_size, num_workers=num_workers, pin_memory=torch.cuda.is_available(),
-                  persistent_workers=num_workers > 0)
+    pin = torch.cuda.is_available()
+    common = dict(batch_size=batch_size, num_workers=num_workers, pin_memory=pin, persistent_workers=num_workers > 0)
     if sampler_power > 0:
         train_loader = DataLoader(train_ds, sampler=balanced_sampler(train_ds.labels, sampler_power, seed),
                                   drop_last=True, **common)
     else:
         generator = torch.Generator().manual_seed(seed)
         train_loader = DataLoader(train_ds, shuffle=True, generator=generator, drop_last=True, **common)
-    val_loader = DataLoader(val_ds, shuffle=False, **common)
+    # Validation has no augmentation, so a few workers keep up. Each worker is a separate process
+    # with its own copy of torch, so this also saves RAM.
+    val_workers = min(num_workers, 2)
+    val_loader = DataLoader(val_ds, batch_size=batch_size * 2, shuffle=False, num_workers=val_workers,
+                            pin_memory=pin, persistent_workers=val_workers > 0)
     return train_loader, val_loader
 
 
-def build_test_loader(img_size: int = 224, batch_size: int = 64, num_workers: int = 4) -> DataLoader:
+def build_test_loader(img_size: int = 224, batch_size: int = 64, num_workers: int = 4,
+                      cache_short_side: int | None = None) -> DataLoader:
     """The held-out ISIC 2018 Task 3 test set. Only for the final evaluation."""
-    ds = SkinLesionDataset(load_test(), TEST_IMAGE_DIR, build_transforms(img_size, train=False))
+    ds = SkinLesionDataset(load_test(), image_dir_for(TEST_IMAGE_DIR, cache_short_side),
+                           build_transforms(img_size, train=False))
     return DataLoader(ds, batch_size=batch_size, shuffle=False, num_workers=num_workers,
                       pin_memory=torch.cuda.is_available())
 

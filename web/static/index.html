@@ -99,24 +99,17 @@
   </div>
 </section>
 
-<div class="ticker" aria-hidden="true">
-  <div class="ticker__track">
-    <span>Melanoma</span><span>Melanocytic nevus</span><span>Basal cell carcinoma</span><span>Actinic keratosis</span><span>Benign keratosis</span><span>Dermatofibroma</span><span>Vascular lesion</span>
-    <span>Melanoma</span><span>Melanocytic nevus</span><span>Basal cell carcinoma</span><span>Actinic keratosis</span><span>Benign keratosis</span><span>Dermatofibroma</span><span>Vascular lesion</span>
-  </div>
-</div>
-
 <!-- WHY -->
 <section class="section why">
   <div class="container why__grid">
     <div class="reveal">
       <p class="eyebrow"><span class="idx">01</span>Why it exists</p>
       <h2>Found a new spot and can't stop <em>thinking about it?</em></h2>
+      <ul class="feelings" aria-label="Common feelings">
+        <li>Worried</li><li>Unsure</li><li>Curious</li><li>Anxious</li><li>Impatient</li>
+      </ul>
     </div>
     <div class="why__body reveal">
-      <ul class="feelings" aria-label="Common feelings">
-        <li>Worried</li><li>Unsure</li><li>Curious</li><li>Anxious</li><li>Impatient</li><li>Hopeful</li>
-      </ul>
       <p>New and changing spots are among the most common reasons people see a dermatologist, and the wait can feel long. SkinDetect shows how a neural network reads a dermoscopy image: fast, open about its uncertainty, and clear that it is <strong>a teaching tool, not a diagnosis</strong>.</p>
       <a class="link-arrow" href="#analyze">Try the analyser <svg><use href="#i-arrow"/></svg></a>
     </div>
@@ -132,7 +125,7 @@
 </section>
 
 <!-- ANALYZER -->
-<section class="section analyze" id="analyze">
+<section class="section section--tint analyze" id="analyze">
   <div class="container">
     <div class="section__head reveal">
       <p class="eyebrow"><span class="idx">02</span>The analyser</p>
@@ -210,22 +203,6 @@
   </div>
 </section>
 
-<!-- STAT BAND -->
-<section class="band" aria-labelledby="bandTitle">
-  <div class="band__media" style="background-image:url('assets/lesions/mel.jpg')"></div>
-  <div class="container band__inner">
-    <div class="reveal">
-      <p class="eyebrow eyebrow--light">Why early matters</p>
-      <h2 id="bandTitle">Caught early, melanoma is one of the most treatable cancers.</h2>
-    </div>
-    <div class="band__stats reveal">
-      <div class="band__stat"><span class="band__num">99%</span><p>five-year relative survival when melanoma is found before it spreads</p></div>
-      <div class="band__stat"><span class="band__num">7</span><p>lesion types in HAM10000, three of them malignant</p></div>
-    </div>
-    <p class="band__source reveal">Survival figure: American Cancer Society, from SEER data.</p>
-  </div>
-</section>
-
 <!-- LESION TYPES -->
 <section class="section lesions" id="lesions">
   <div class="container">
@@ -247,7 +224,7 @@
 </section>
 
 <!-- HOW IT WORKS -->
-<section class="section how" id="how">
+<section class="section section--tint how" id="how">
   <div class="container how__grid">
     <div>
       <div class="section__head reveal">
@@ -287,42 +264,12 @@
   </div>
 </section>
 
-<!-- WHERE IT FITS -->
-<section class="section timeline">
-  <div class="container">
-    <div class="section__head section__head--center reveal">
-      <p class="eyebrow"><span class="idx">05</span>Where it fits</p>
-      <h2>A second look,<br><em>never the last word.</em></h2>
-    </div>
-    <ol class="tl">
-      <li class="tl__item reveal">
-        <span class="tl__icon"><svg><use href="#i-bolt"/></svg></span>
-        <p class="tl__when">In seconds</p>
-        <h3>The model's read</h3>
-        <ul><li>Probabilities for seven lesion types</li><li>A heatmap of what it looked at</li><li>Useful for learning, not for deciding</li></ul>
-      </li>
-      <li class="tl__item reveal">
-        <span class="tl__icon"><svg><use href="#i-steth"/></svg></span>
-        <p class="tl__when">At your appointment</p>
-        <h3>A dermatologist's exam</h3>
-        <ul><li>The whole skin, not one photo</li><li>Your history and risk factors</li><li>A biopsy when something looks wrong</li></ul>
-      </li>
-      <li class="tl__item reveal">
-        <span class="tl__icon"><svg><use href="#i-cal"/></svg></span>
-        <p class="tl__when">Over the months</p>
-        <h3>Keeping watch</h3>
-        <ul><li>Check your skin regularly</li><li>Note spots that change in size, shape or colour</li><li>Go back if anything changes</li></ul>
-      </li>
-    </ol>
-  </div>
-</section>
-
 <!-- RESULTS -->
 <section class="section results" id="results">
   <div class="container">
     <div class="section__head section__head--row reveal">
       <div>
-        <p class="eyebrow eyebrow--light"><span class="idx">06</span>Results</p>
+        <p class="eyebrow eyebrow--light"><span class="idx">05</span>Results</p>
         <h2>Measured on images<br><em>it never trained on.</em></h2>
       </div>
       <p class="lede lede--light section__aside" id="resultsNote">Cross-validation on HAM10000, split by lesion so the same mole never appears in both training and validation.</p>
@@ -362,7 +309,7 @@
 <section class="section scope">
   <div class="container">
     <div class="section__head reveal">
-      <p class="eyebrow"><span class="idx">07</span>Honest by design</p>
+      <p class="eyebrow"><span class="idx">06</span>Limits</p>
       <h2>Built for learning,<br><em>not for diagnosis.</em></h2>
     </div>
     <div class="scope__grid">
@@ -392,20 +339,11 @@
   </div>
 </section>
 
-<div class="strip" aria-hidden="true">
-  <div class="strip__track">
-    <img src="assets/strip/1.jpg" alt=""><img src="assets/strip/2.jpg" alt=""><img src="assets/strip/3.jpg" alt=""><img src="assets/strip/4.jpg" alt="">
-    <img src="assets/strip/5.jpg" alt=""><img src="assets/strip/6.jpg" alt=""><img src="assets/strip/7.jpg" alt=""><img src="assets/strip/8.jpg" alt="">
-    <img src="assets/strip/1.jpg" alt=""><img src="assets/strip/2.jpg" alt=""><img src="assets/strip/3.jpg" alt=""><img src="assets/strip/4.jpg" alt="">
-    <img src="assets/strip/5.jpg" alt=""><img src="assets/strip/6.jpg" alt=""><img src="assets/strip/7.jpg" alt=""><img src="assets/strip/8.jpg" alt="">
-  </div>
-</div>
-
 <!-- FAQ -->
-<section class="section faq" id="faq">
+<section class="section section--tint faq" id="faq">
   <div class="container faq__grid">
     <div class="faq__aside reveal">
-      <p class="eyebrow"><span class="idx">08</span>Quick answers</p>
+      <p class="eyebrow"><span class="idx">07</span>Quick answers</p>
       <h2>Questions,<br><em>answered.</em></h2>
       <img src="assets/lesions/vasc.jpg" alt="Dermoscopy image of a vascular lesion">
     </div>

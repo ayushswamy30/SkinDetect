@@ -127,16 +127,7 @@ if (!reduceMotion) {
   }, { threshold: 0.35 }).observe($("#how"));
 }
 
-/* ---------- Parallax band & reduced motion ---------- */
-const bandMedia = $(".band__media");
-if (!reduceMotion && bandMedia) {
-  const band = bandMedia.parentElement;
-  window.addEventListener("scroll", () => {
-    const r = band.getBoundingClientRect();
-    if (r.bottom < 0 || r.top > innerHeight) return;
-    bandMedia.style.setProperty("--parallax", `${((r.top + r.height / 2 - innerHeight / 2) * -0.12).toFixed(1)}px`);
-  }, { passive: true });
-}
+/* ---------- Reduced motion ---------- */
 if (reduceMotion) $$("video").forEach((v) => { v.removeAttribute("autoplay"); v.pause(); });
 
 /* ---------- Tooltip ---------- */

@@ -31,13 +31,17 @@ that drove the prediction.
 
 <!-- RESULTS:START -->
 Five-fold cross-validation, split by lesion so that no lesion appears in both training and validation.
-Out-of-fold numbers pool the validation predictions of all folds (8-view test-time augmentation).
+Out-of-fold numbers pool the validation predictions of all five folds (10,015 images).
 
 | Model | Balanced acc. | Accuracy | Macro F1 | Macro AUC | Malignant sens. / spec. |
 |---|---|---|---|---|---|
-| Baseline, EfficientNet-B0 224px (folds 0-2) | 0.753 | 0.830 | 0.745 | 0.972 | 0.763 / 0.902 |
+| Baseline, EfficientNet-B0 224px | 0.754 | 0.823 | 0.736 | 0.967 | 0.762 / 0.898 |
 
-Final model and ISIC 2018 test-set results are added when training finishes.
+Per fold, balanced accuracy ranges from 0.734 to 0.766. Recall is highest for nevi (0.87) and vascular
+lesions (0.90) and lowest for actinic keratosis (0.49), which is most often mistaken for benign keratosis.
+Temperature scaling (T = 2.26) cuts the expected calibration error from 9.9% to 1.1%.
+
+Improvement experiments and the ISIC 2018 test-set result are added when they finish.
 <!-- RESULTS:END -->
 
 Balanced accuracy (mean recall over the seven classes) is the ISIC 2018 Task 3 ranking metric. Malignant
@@ -55,7 +59,7 @@ matters for a referral decision.
 3. **Ensemble and TTA:** the five fold models are averaged, each over eight rotations and mirrorings of
    the image.
 4. **Calibration:** the networks are over-confident; one temperature fitted on the out-of-fold
-   predictions fixes that (expected calibration error 6.8% → 1.1% for the baseline).
+   predictions fixes that (expected calibration error 9.9% → 1.1% for the baseline).
 5. **Explanation:** Grad-CAM on the last convolutional feature map. For EfficientNet's average-pool +
    linear head it equals CAM exactly, so the ONNX export computes the maps inside the graph.
 6. **Serving:** ONNX Runtime behind FastAPI, no PyTorch needed; the website is plain HTML/CSS/JS.

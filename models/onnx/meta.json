@@ -11,48 +11,177 @@
   "files": [
     "fold0.onnx",
     "fold1.onnx",
-    "fold2.onnx"
+    "fold2.onnx",
+    "fold3.onnx",
+    "fold4.onnx"
   ],
   "model_name": "efficientnet_b0",
   "img_size": 224,
   "cache_short_side": 300,
-  "temperature": 1.8200976873845676,
+  "temperature": 2.258155201635156,
   "metadata": {
     "name": "baseline",
     "folds": {
       "0": "baseline_fold0_20261119-004936",
       "1": "baseline_fold1_20261124-182744",
-      "2": "baseline_fold2_20261124-185447"
+      "2": "baseline_fold2_20261124-185447",
+      "3": "baseline_fold3_20261124-192514",
+      "4": "baseline_fold4_20261124-221517"
     },
-    "exported": "2026-11-24T19:56:03",
+    "exported": "2026-11-24T23:03:56",
     "oof": {
-      "balanced_acc": 0.7526126619763638,
-      "acc": 0.8304492512479201,
-      "macro_f1": 0.7450069276544611,
-      "macro_auc": 0.9718368388491935,
-      "recall_akiec": 0.45685279187817257,
-      "recall_bcc": 0.8084415584415584,
-      "recall_bkl": 0.8,
-      "recall_df": 0.6956521739130435,
-      "recall_mel": 0.7271364317841079,
-      "recall_nv": 0.8732289336316182,
-      "recall_vasc": 0.9069767441860465,
-      "malignant_sensitivity": 0.7627986348122867,
-      "malignant_specificity": 0.9024390243902439,
-      "malignant_auc": 0.9303469969679738
+      "balanced_acc": 0.753876080966931,
+      "acc": 0.8228657014478282,
+      "macro_f1": 0.735619309767105,
+      "macro_auc": 0.9673364454576124,
+      "recall_akiec": 0.48623853211009177,
+      "recall_bcc": 0.7801556420233463,
+      "recall_bkl": 0.7679708826205641,
+      "recall_df": 0.7565217391304347,
+      "recall_mel": 0.7160826594788859,
+      "recall_nv": 0.8687546607009694,
+      "recall_vasc": 0.9014084507042254,
+      "malignant_sensitivity": 0.7620266120777891,
+      "malignant_specificity": 0.897903485919861,
+      "malignant_auc": 0.9261097285704183
     },
     "test": null,
     "calibration": {
-      "temperature": 1.8200976873845676,
-      "tta_views": 8,
+      "temperature": 2.258155201635156,
+      "tta_views": 1,
       "oof_before": {
-        "nll": 0.5332566499710083,
-        "ece": 0.0679967047073282
+        "nll": 0.6510972525413309,
+        "ece": 0.09852149294058915
       },
       "oof_after": {
-        "nll": 0.4505347013473511,
-        "ece": 0.011277538999146521
+        "nll": 0.47315158364544235,
+        "ece": 0.010702343129749457
       }
-    }
+    },
+    "per_class": [
+      {
+        "class": "akiec",
+        "precision": 0.791,
+        "recall": 0.4862,
+        "f1": 0.6023,
+        "auc": 0.9696,
+        "support": 327
+      },
+      {
+        "class": "bcc",
+        "precision": 0.7667,
+        "recall": 0.7802,
+        "f1": 0.7734,
+        "auc": 0.9856,
+        "support": 514
+      },
+      {
+        "class": "bkl",
+        "precision": 0.6583,
+        "recall": 0.768,
+        "f1": 0.7089,
+        "auc": 0.955,
+        "support": 1099
+      },
+      {
+        "class": "df",
+        "precision": 0.635,
+        "recall": 0.7565,
+        "f1": 0.6905,
+        "auc": 0.9892,
+        "support": 115
+      },
+      {
+        "class": "mel",
+        "precision": 0.5019,
+        "recall": 0.7161,
+        "f1": 0.5902,
+        "auc": 0.9206,
+        "support": 1113
+      },
+      {
+        "class": "nv",
+        "precision": 0.9496,
+        "recall": 0.8688,
+        "f1": 0.9074,
+        "auc": 0.9591,
+        "support": 6705
+      },
+      {
+        "class": "vasc",
+        "precision": 0.8533,
+        "recall": 0.9014,
+        "f1": 0.8767,
+        "auc": 0.9922,
+        "support": 142
+      }
+    ],
+    "confusion": [
+      [
+        159,
+        27,
+        75,
+        6,
+        47,
+        13,
+        0
+      ],
+      [
+        10,
+        401,
+        42,
+        7,
+        29,
+        22,
+        3
+      ],
+      [
+        25,
+        17,
+        844,
+        6,
+        131,
+        74,
+        2
+      ],
+      [
+        3,
+        3,
+        6,
+        87,
+        9,
+        6,
+        1
+      ],
+      [
+        1,
+        18,
+        94,
+        7,
+        797,
+        188,
+        8
+      ],
+      [
+        3,
+        53,
+        220,
+        23,
+        573,
+        5825,
+        8
+      ],
+      [
+        0,
+        4,
+        1,
+        1,
+        2,
+        6,
+        128
+      ]
+    ],
+    "n_images": 10015,
+    "n_folds": 5
   }
 }

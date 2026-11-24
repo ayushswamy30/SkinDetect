@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>SkinDetect · Dermoscopy lesion classifier</title>
   <meta name="description" content="A research demo that classifies dermoscopy images into seven skin lesion types with a calibrated deep-learning ensemble and Grad-CAM explanations.">
+  <meta name="theme-color" content="#15110e">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,6 +14,17 @@
 </head>
 <body>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="9" r="4.5"/><circle cx="23" cy="9" r="4.5"/><circle cx="9" cy="23" r="4.5"/><circle cx="23" cy="23" r="4.5"/><circle cx="23" cy="23" r="1.6" fill="currentColor"/></g></symbol>
+  <symbol id="i-gauge" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 22a11 11 0 1 1 22 0"/><path d="M16 22l6-7"/><circle cx="16" cy="22" r="1.8" fill="currentColor"/><path d="M5 27h22"/></g></symbol>
+  <symbol id="i-eye" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 16s5-8 13-8 13 8 13 8-5 8-13 8S3 16 3 16z"/><circle cx="16" cy="16" r="4.5"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/></g></symbol>
+  <symbol id="i-lock" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="7" y="14" width="18" height="13" rx="3"/><path d="M11 14v-3a5 5 0 0 1 10 0v3"/><path d="M16 19v3"/></g></symbol>
+  <symbol id="i-bolt" viewBox="0 0 32 32"><path d="M18 3L7 18h8l-2 11 12-16h-8z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="i-steth" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 4v8a6 6 0 0 0 12 0V4"/><path d="M14 18v3a6 6 0 0 0 12 0v-2"/><circle cx="26" cy="16" r="3"/></g></symbol>
+  <symbol id="i-cal" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="7" width="22" height="20" rx="3"/><path d="M5 13h22M11 4v6M21 4v6"/><path d="M11 19l3 3 6-6"/></g></symbol>
+</svg>
+
 <header class="nav" id="nav">
   <div class="nav__inner">
     <a class="wordmark" href="#top" aria-label="SkinDetect home"><span class="wordmark__dot"></span>SkinDetect</a>
@@ -20,22 +32,24 @@
       <a href="#analyze">Analyse</a>
       <a href="#lesions">Lesion types</a>
       <a href="#how">How it works</a>
-      <a href="#performance">Performance</a>
+      <a href="#results">Results</a>
       <a href="#faq">FAQ</a>
     </nav>
-    <a class="btn btn--pill btn--light nav__cta" href="#analyze">Try it <span class="btn__arrow" aria-hidden="true">→</span></a>
+    <a class="btn btn--pill btn--light nav__cta" href="#analyze">Try it <span class="btn__arrow"><svg><use href="#i-arrow"/></svg></span></a>
     <button class="nav__toggle" id="menuToggle" aria-expanded="false" aria-controls="menu">Menu</button>
   </div>
 </header>
 
 <div class="menu" id="menu" hidden>
-  <div class="menu__inner">
-    <p class="eyebrow">Discover</p>
-    <a href="#analyze">Analyse an image</a>
-    <a href="#lesions">Lesion types</a>
-    <a href="#how">How it works</a>
-    <a href="#performance">Performance</a>
-    <a href="#faq">Quick answers</a>
+  <div class="menu__inner container">
+    <p class="eyebrow eyebrow--light">Discover</p>
+    <nav class="menu__links">
+      <a href="#analyze"><span>01</span>Analyse an image</a>
+      <a href="#lesions"><span>02</span>Lesion types</a>
+      <a href="#how"><span>03</span>How it works</a>
+      <a href="#results"><span>04</span>Results</a>
+      <a href="#faq"><span>05</span>Quick answers</a>
+    </nav>
     <p class="menu__note">Research demo · not a medical device</p>
   </div>
 </div>
@@ -47,28 +61,44 @@
     <source src="assets/video/hero.mp4" type="video/mp4">
   </video>
   <div class="hero__shade"></div>
-  <div class="hero__content container">
-    <p class="eyebrow eyebrow--light reveal">Dermoscopy · Deep learning · Research demo</p>
-    <h1 class="hero__title reveal">See beyond the surface.<br><em>Read a lesion in seconds.</em></h1>
-    <ul class="hero__points reveal">
-      <li><span class="icon-dot"></span>Seven lesion types, from harmless moles to melanoma</li>
-      <li><span class="icon-dot"></span>Calibrated probabilities, not just a label</li>
-      <li><span class="icon-dot"></span>A heatmap of what the network looked at</li>
-    </ul>
-    <div class="hero__ctas reveal">
-      <a class="btn btn--pill btn--accent" href="#analyze">Analyse an image <span class="btn__arrow" aria-hidden="true">→</span></a>
-      <a class="btn btn--ghost" href="#how">How it works</a>
+  <div class="container hero__grid">
+    <div class="hero__copy">
+      <p class="chip chip--glass reveal"><span class="chip__dot"></span>Research demo · trained on 10,015 dermoscopy images</p>
+      <h1 class="hero__title reveal">See beyond the surface.<br><em>Read a lesion in seconds.</em></h1>
+      <p class="hero__lede reveal">Upload a dermoscopy image. An ensemble of neural networks returns calibrated probabilities for seven lesion types, and a heatmap of what it looked at.</p>
+      <div class="hero__ctas reveal">
+        <a class="btn btn--pill btn--accent" href="#analyze">Analyse an image <span class="btn__arrow"><svg><use href="#i-arrow"/></svg></span></a>
+        <a class="btn btn--ghost" href="#how">How it works</a>
+      </div>
     </div>
-    <dl class="stats reveal">
+    <aside class="preview reveal" aria-label="Example result">
+      <div class="preview__head"><span class="chip chip--tiny">Example result</span><span class="preview__time">validation image</span></div>
+      <div class="preview__media">
+        <img src="assets/example/lesion.jpg" alt="Dermoscopy image of a melanoma from the validation set">
+        <img class="preview__cam" src="assets/example/heatmap.jpg" alt="">
+        <span class="preview__scan" aria-hidden="true"></span>
+      </div>
+      <div class="preview__body">
+        <div class="preview__top"><div><small>Most likely</small><strong>Melanoma</strong></div><span class="preview__pct">77%</span></div>
+        <ul class="minibars">
+          <li><span>Melanoma</span><i style="--w:.77"></i><b>77%</b></li>
+          <li><span>Nevus</span><i style="--w:.15"></i><b>15%</b></li>
+          <li><span>Keratosis</span><i style="--w:.06"></i><b>6%</b></li>
+        </ul>
+        <p class="preview__foot"><span class="tag tag--m">malignant type</span> 78% combined malignancy</p>
+      </div>
+    </aside>
+  </div>
+  <div class="container">
+    <dl class="hero__stats reveal">
       <div><dt><span class="count" data-to="10015">0</span></dt><dd>dermoscopy images learned from</dd></div>
       <div><dt><span class="count" data-to="7">0</span></dt><dd>lesion types recognised</dd></div>
-      <div><dt><span class="count" data-to="5" data-model="ensemble_size">0</span></dt><dd>networks voting on every image</dd></div>
-      <div><dt><span class="count" data-to="8" data-model="tta_views">0</span></dt><dd>views of each image averaged</dd></div>
+      <div><dt><span class="count" data-to="5" data-model="ensemble_size">0</span></dt><dd>networks voting on each image</dd></div>
+      <div><dt><span class="count" data-to="8" data-model="tta_views">0</span></dt><dd>views of the image averaged</dd></div>
     </dl>
   </div>
 </section>
 
-<!-- TICKER -->
 <div class="ticker" aria-hidden="true">
   <div class="ticker__track">
     <span>Melanoma</span><span>Melanocytic nevus</span><span>Basal cell carcinoma</span><span>Actinic keratosis</span><span>Benign keratosis</span><span>Dermatofibroma</span><span>Vascular lesion</span>
@@ -76,13 +106,38 @@
   </div>
 </div>
 
+<!-- WHY -->
+<section class="section why">
+  <div class="container why__grid">
+    <div class="reveal">
+      <p class="eyebrow"><span class="idx">01</span>Why it exists</p>
+      <h2>Found a new spot and can't stop <em>thinking about it?</em></h2>
+    </div>
+    <div class="why__body reveal">
+      <ul class="feelings" aria-label="Common feelings">
+        <li>Worried</li><li>Unsure</li><li>Curious</li><li>Anxious</li><li>Impatient</li><li>Hopeful</li>
+      </ul>
+      <p>New and changing spots are among the most common reasons people see a dermatologist, and the wait can feel long. SkinDetect shows how a neural network reads a dermoscopy image: fast, open about its uncertainty, and clear that it is <strong>a teaching tool, not a diagnosis</strong>.</p>
+      <a class="link-arrow" href="#analyze">Try the analyser <svg><use href="#i-arrow"/></svg></a>
+    </div>
+  </div>
+  <div class="container">
+    <div class="features">
+      <article class="feature reveal"><svg class="feature__icon"><use href="#i-grid"/></svg><h3>Seven lesion types</h3><p>From harmless moles and keratoses to melanoma and basal cell carcinoma.</p></article>
+      <article class="feature reveal"><svg class="feature__icon"><use href="#i-gauge"/></svg><h3>Calibrated confidence</h3><p>Probabilities are tuned so that 70% is right about 70% of the time.</p></article>
+      <article class="feature reveal"><svg class="feature__icon"><use href="#i-eye"/></svg><h3>Visual explanation</h3><p>A Grad-CAM heatmap shows which regions drove each prediction.</p></article>
+      <article class="feature reveal"><svg class="feature__icon"><use href="#i-lock"/></svg><h3>Private by design</h3><p>Images are analysed in memory and never stored or logged.</p></article>
+    </div>
+  </div>
+</section>
+
 <!-- ANALYZER -->
 <section class="section analyze" id="analyze">
   <div class="container">
     <div class="section__head reveal">
-      <p class="eyebrow">The analyser</p>
+      <p class="eyebrow"><span class="idx">02</span>The analyser</p>
       <h2>Drop in a dermoscopy image.<br><em>Get a second look.</em></h2>
-      <p class="lede">Images taken through a dermatoscope work best: close-up, evenly lit, lesion centred. The image is processed in memory and not stored.</p>
+      <p class="lede">Images taken through a dermatoscope work best: close-up, evenly lit, lesion centred. Results take a few seconds.</p>
     </div>
 
     <div class="analyze__grid">
@@ -93,29 +148,32 @@
           <span class="dropzone__empty" id="dropEmpty">
             <span class="dropzone__icon" aria-hidden="true">＋</span>
             <strong>Drag an image here</strong>
-            <span>or click to choose · JPEG, PNG or WebP · up to 15 MB</span>
+            <span>or click to choose · paste works too<br>JPEG, PNG or WebP · up to 15 MB</span>
           </span>
         </label>
-        <p class="samples__label">Or try an example from the dataset</p>
-        <div class="samples" id="samples">
-          <button type="button" data-sample="mel"><img src="assets/lesions/mel.jpg" alt="Melanoma example"></button>
-          <button type="button" data-sample="nv"><img src="assets/lesions/nv.jpg" alt="Melanocytic nevus example"></button>
-          <button type="button" data-sample="bcc"><img src="assets/lesions/bcc.jpg" alt="Basal cell carcinoma example"></button>
-          <button type="button" data-sample="bkl"><img src="assets/lesions/bkl.jpg" alt="Benign keratosis example"></button>
-          <button type="button" data-sample="vasc"><img src="assets/lesions/vasc.jpg" alt="Vascular lesion example"></button>
-          <button type="button" data-sample="akiec"><img src="assets/lesions/akiec.jpg" alt="Actinic keratosis example"></button>
-          <button type="button" data-sample="df"><img src="assets/lesions/df.jpg" alt="Dermatofibroma example"></button>
+        <div class="samples__row">
+          <p class="samples__label">Or try an example</p>
+          <div class="samples" id="samples">
+            <button type="button" data-sample="mel" title="Melanoma"><img src="assets/lesions/mel.jpg" alt="Melanoma example"></button>
+            <button type="button" data-sample="nv" title="Melanocytic nevus"><img src="assets/lesions/nv.jpg" alt="Melanocytic nevus example"></button>
+            <button type="button" data-sample="bcc" title="Basal cell carcinoma"><img src="assets/lesions/bcc.jpg" alt="Basal cell carcinoma example"></button>
+            <button type="button" data-sample="bkl" title="Benign keratosis"><img src="assets/lesions/bkl.jpg" alt="Benign keratosis example"></button>
+            <button type="button" data-sample="vasc" title="Vascular lesion"><img src="assets/lesions/vasc.jpg" alt="Vascular lesion example"></button>
+            <button type="button" data-sample="akiec" title="Actinic keratosis"><img src="assets/lesions/akiec.jpg" alt="Actinic keratosis example"></button>
+            <button type="button" data-sample="df" title="Dermatofibroma"><img src="assets/lesions/df.jpg" alt="Dermatofibroma example"></button>
+          </div>
         </div>
       </div>
 
       <div class="panel result reveal" id="result" aria-live="polite">
         <div class="result__idle" id="resultIdle">
           <p class="eyebrow">Result</p>
-          <p class="result__placeholder">Your analysis will appear here: the most likely lesion type, the probability of each class, a malignancy score and a heatmap.</p>
+          <p class="result__placeholder">Your analysis appears here: the most likely lesion type, every class's probability, a malignancy score and a heatmap.</p>
+          <ol class="result__steps"><li>Choose or drop an image</li><li>Wait a few seconds</li><li>Compare the heatmap with the original</li></ol>
         </div>
         <div class="result__loading" id="resultLoading" hidden>
           <span class="spinner" aria-hidden="true"></span>
-          <p>Running five networks over eight views…</p>
+          <p>Running the ensemble over several views…</p>
         </div>
         <div class="result__error" id="resultError" hidden></div>
         <div class="result__body" id="resultBody" hidden>
@@ -128,22 +186,22 @@
             <div class="gauge" id="gauge" style="--p: 0">
               <svg viewBox="0 0 120 120" aria-hidden="true">
                 <circle cx="60" cy="60" r="52" class="gauge__track"/>
-                <circle cx="60" cy="60" r="52" class="gauge__fill" id="gaugeFill"/>
+                <circle cx="60" cy="60" r="52" class="gauge__fill"/>
               </svg>
               <div class="gauge__label"><strong id="malignantProb">–</strong><span>malignant</span></div>
             </div>
           </div>
           <div class="result__split">
-          <ul class="bars" id="bars"></ul>
-          <div>
-          <div class="compare" id="compare">
-            <img id="inputImg" alt="The image as the model sees it">
-            <div class="compare__over" id="compareOver"><img id="heatImg" alt="Grad-CAM heatmap overlay"></div>
-            <input type="range" min="0" max="100" value="55" id="compareRange" aria-label="Reveal heatmap">
-            <span class="compare__tag compare__tag--l">Heatmap</span><span class="compare__tag compare__tag--r">Original</span>
-          </div>
-          <p class="result__note">Drag to compare. Warm areas pushed the <em>predicted class</em> score up the most.</p>
-          </div>
+            <ul class="bars" id="bars"></ul>
+            <figure class="result__figure">
+              <div class="compare" id="compare">
+                <img id="inputImg" alt="The image as the model sees it">
+                <div class="compare__over"><img id="heatImg" alt="Grad-CAM heatmap overlay"></div>
+                <input type="range" min="0" max="100" value="55" id="compareRange" aria-label="Reveal heatmap">
+                <span class="compare__tag compare__tag--l">Heatmap</span><span class="compare__tag compare__tag--r">Original</span>
+              </div>
+              <figcaption>Drag to compare. Warm areas pushed the <em>predicted class</em> up the most.</figcaption>
+            </figure>
           </div>
         </div>
         <p class="disclaimer"><strong>Not a diagnosis.</strong> This research model can be confidently wrong. Anyone worried about a skin lesion should see a dermatologist.</p>
@@ -155,13 +213,16 @@
 <!-- STAT BAND -->
 <section class="band" aria-labelledby="bandTitle">
   <div class="band__media" style="background-image:url('assets/lesions/mel.jpg')"></div>
-  <div class="container band__inner reveal">
-    <p class="eyebrow eyebrow--light">Why it matters</p>
-    <h2 id="bandTitle">Caught early, melanoma is one of the most treatable cancers.</h2>
-    <div class="band__stat">
-      <span class="band__num">99%</span>
-      <p>five-year relative survival when melanoma is found before it spreads.<br><small>American Cancer Society, from SEER data</small></p>
+  <div class="container band__inner">
+    <div class="reveal">
+      <p class="eyebrow eyebrow--light">Why early matters</p>
+      <h2 id="bandTitle">Caught early, melanoma is one of the most treatable cancers.</h2>
     </div>
+    <div class="band__stats reveal">
+      <div class="band__stat"><span class="band__num">99%</span><p>five-year relative survival when melanoma is found before it spreads</p></div>
+      <div class="band__stat"><span class="band__num">7</span><p>lesion types in HAM10000, three of them malignant</p></div>
+    </div>
+    <p class="band__source reveal">Survival figure: American Cancer Society, from SEER data.</p>
   </div>
 </section>
 
@@ -170,12 +231,15 @@
   <div class="container">
     <div class="section__head section__head--row reveal">
       <div>
-        <p class="eyebrow">Seven lesion types</p>
-        <h2>What the model can tell apart.</h2>
+        <p class="eyebrow"><span class="idx">03</span>Seven lesion types</p>
+        <h2>What the model<br><em>can tell apart.</em></h2>
       </div>
-      <div class="carousel__controls">
-        <button class="round" data-scroll="-1" aria-label="Previous">←</button>
-        <button class="round" data-scroll="1" aria-label="Next">→</button>
+      <div class="section__aside">
+        <p>The big number is the share of each type the model recognised in cross-validation.</p>
+        <div class="carousel__controls">
+          <button class="round" data-scroll="-1" aria-label="Previous"><svg style="transform:scaleX(-1)"><use href="#i-arrow"/></svg></button>
+          <button class="round" data-scroll="1" aria-label="Next"><svg><use href="#i-arrow"/></svg></button>
+        </div>
       </div>
     </div>
   </div>
@@ -187,21 +251,19 @@
   <div class="container how__grid">
     <div>
       <div class="section__head reveal">
-        <p class="eyebrow">How it works</p>
+        <p class="eyebrow"><span class="idx">04</span>How it works</p>
         <h2>Four steps from pixels<br><em>to a probability.</em></h2>
       </div>
       <ol class="steps" id="steps">
-        <li class="is-active" data-step="0"><button type="button"><span class="steps__n">01</span><span><strong>Standardise</strong><small>The image is scaled and centre-cropped exactly as the training images were.</small></span></button></li>
-        <li data-step="1"><button type="button"><span class="steps__n">02</span><span><strong>Look eight ways</strong><small>Lesions have no "up", so each image is rotated and mirrored into eight views.</small></span></button></li>
-        <li data-step="2"><button type="button"><span class="steps__n">03</span><span><strong>Vote and calibrate</strong><small>Five networks, each trained on a different slice of the data, average their answers. Temperature scaling turns scores into honest probabilities.</small></span></button></li>
-        <li data-step="3"><button type="button"><span class="steps__n">04</span><span><strong>Explain</strong><small>Grad-CAM traces the prediction back to the regions of the image that drove it.</small></span></button></li>
+        <li class="is-active"><button type="button"><span class="steps__n">01</span><span><strong>Standardise</strong><small>The image is scaled and centre-cropped exactly as the training images were.</small></span></button></li>
+        <li><button type="button"><span class="steps__n">02</span><span><strong>Look several ways</strong><small>Lesions have no "up", so the image is rotated and mirrored into several views.</small></span></button></li>
+        <li><button type="button"><span class="steps__n">03</span><span><strong>Vote and calibrate</strong><small>Networks trained on different slices of the data average their answers; temperature scaling turns scores into honest probabilities.</small></span></button></li>
+        <li><button type="button"><span class="steps__n">04</span><span><strong>Explain</strong><small>Grad-CAM traces the prediction back to the regions of the image that drove it.</small></span></button></li>
       </ol>
     </div>
     <div class="how__visual reveal" id="howVisual">
-      <div class="how__pane is-active" data-pane="0">
-        <div class="how__frame"><img src="assets/lesions/bkl.jpg" alt=""><span class="how__crop"></span></div>
-      </div>
-      <div class="how__pane" data-pane="1">
+      <div class="how__pane is-active"><div class="how__frame"><img src="assets/lesions/bkl.jpg" alt=""><span class="how__crop"></span></div></div>
+      <div class="how__pane">
         <div class="views">
           <img src="assets/lesions/mel.jpg" alt=""><img src="assets/lesions/mel.jpg" alt="" style="transform:scaleX(-1)">
           <img src="assets/lesions/mel.jpg" alt="" style="transform:rotate(180deg)"><img src="assets/lesions/mel.jpg" alt="" style="transform:scaleY(-1)">
@@ -209,47 +271,98 @@
           <img src="assets/lesions/mel.jpg" alt="" style="transform:rotate(270deg)"><img src="assets/lesions/mel.jpg" alt="" style="transform:rotate(270deg) scaleX(-1)">
         </div>
       </div>
-      <div class="how__pane" data-pane="2">
+      <div class="how__pane">
         <div class="vote">
           <div class="vote__nets"><span>Net 1</span><span>Net 2</span><span>Net 3</span><span>Net 4</span><span>Net 5</span></div>
-          <ul class="bars bars--demo">
-            <li><span>mel</span><i style="--w:.71"></i><b>71%</b></li>
-            <li><span>nv</span><i style="--w:.16"></i><b>16%</b></li>
-            <li><span>bkl</span><i style="--w:.09"></i><b>9%</b></li>
-            <li><span>other</span><i style="--w:.04"></i><b>4%</b></li>
+          <ul class="minibars minibars--dark">
+            <li><span>Melanoma</span><i style="--w:.77"></i><b>77%</b></li>
+            <li><span>Nevus</span><i style="--w:.15"></i><b>15%</b></li>
+            <li><span>Keratosis</span><i style="--w:.06"></i><b>6%</b></li>
+            <li><span>Other</span><i style="--w:.02"></i><b>2%</b></li>
           </ul>
         </div>
       </div>
-      <div class="how__pane" data-pane="3">
-        <div class="how__frame how__frame--cam"><img src="assets/lesions/bcc.jpg" alt=""><span class="how__cam"></span></div>
-      </div>
+      <div class="how__pane"><div class="how__frame how__frame--square"><img src="assets/example/heatmap.jpg" alt=""></div></div>
     </div>
   </div>
 </section>
 
-<!-- PERFORMANCE -->
-<section class="section perf" id="performance">
+<!-- WHERE IT FITS -->
+<section class="section timeline">
   <div class="container">
-    <div class="section__head reveal">
-      <p class="eyebrow eyebrow--light">Performance</p>
-      <h2>Measured on images<br><em>the model never trained on.</em></h2>
-      <p class="lede lede--light" id="perfNote">Five-fold cross-validation on HAM10000, split by lesion so the same mole never appears in both training and validation.</p>
+    <div class="section__head section__head--center reveal">
+      <p class="eyebrow"><span class="idx">05</span>Where it fits</p>
+      <h2>A second look,<br><em>never the last word.</em></h2>
     </div>
-    <dl class="perf__stats reveal">
-      <div><dt data-metric="balanced_acc">–</dt><dd>Balanced accuracy<small>the ISIC 2018 ranking metric: recall averaged over all seven classes</small></dd></div>
-      <div><dt data-metric="macro_auc">–</dt><dd>Macro AUC<small>how well each class is ranked above the rest</small></dd></div>
-      <div><dt data-metric="malignant_sensitivity">–</dt><dd>Malignant sensitivity<small>malignant lesions flagged as a malignant type</small></dd></div>
-      <div><dt data-metric="malignant_specificity">–</dt><dd>Benign specificity<small>benign lesions correctly left unflagged</small></dd></div>
-    </dl>
-    <p class="perf__foot" id="perfFoot"></p>
+    <ol class="tl">
+      <li class="tl__item reveal">
+        <span class="tl__icon"><svg><use href="#i-bolt"/></svg></span>
+        <p class="tl__when">In seconds</p>
+        <h3>The model's read</h3>
+        <ul><li>Probabilities for seven lesion types</li><li>A heatmap of what it looked at</li><li>Useful for learning, not for deciding</li></ul>
+      </li>
+      <li class="tl__item reveal">
+        <span class="tl__icon"><svg><use href="#i-steth"/></svg></span>
+        <p class="tl__when">At your appointment</p>
+        <h3>A dermatologist's exam</h3>
+        <ul><li>The whole skin, not one photo</li><li>Your history and risk factors</li><li>A biopsy when something looks wrong</li></ul>
+      </li>
+      <li class="tl__item reveal">
+        <span class="tl__icon"><svg><use href="#i-cal"/></svg></span>
+        <p class="tl__when">Over the months</p>
+        <h3>Keeping watch</h3>
+        <ul><li>Check your skin regularly</li><li>Note spots that change in size, shape or colour</li><li>Go back if anything changes</li></ul>
+      </li>
+    </ol>
   </div>
 </section>
 
-<!-- SCOPE CARDS -->
+<!-- RESULTS -->
+<section class="section results" id="results">
+  <div class="container">
+    <div class="section__head section__head--row reveal">
+      <div>
+        <p class="eyebrow eyebrow--light"><span class="idx">06</span>Results</p>
+        <h2>Measured on images<br><em>it never trained on.</em></h2>
+      </div>
+      <p class="lede lede--light section__aside" id="resultsNote">Cross-validation on HAM10000, split by lesion so the same mole never appears in both training and validation.</p>
+    </div>
+
+    <div class="kpis reveal">
+      <div class="kpi"><p class="kpi__label">Balanced accuracy</p><p class="kpi__value" data-metric="balanced_acc">–</p><span class="meter"><i data-meter="balanced_acc"></i></span><p class="kpi__note">Recall averaged over all seven classes; the ISIC 2018 ranking metric</p></div>
+      <div class="kpi"><p class="kpi__label">Macro AUC</p><p class="kpi__value" data-metric="macro_auc">–</p><span class="meter"><i data-meter="macro_auc"></i></span><p class="kpi__note">How well each class is ranked above the rest (1.0 is perfect)</p></div>
+      <div class="kpi"><p class="kpi__label">Malignant caught</p><p class="kpi__value" data-metric="malignant_sensitivity">–</p><span class="meter"><i data-meter="malignant_sensitivity"></i></span><p class="kpi__note">Malignant lesions predicted as any malignant type</p></div>
+      <div class="kpi"><p class="kpi__label">Benign cleared</p><p class="kpi__value" data-metric="malignant_specificity">–</p><span class="meter"><i data-meter="malignant_specificity"></i></span><p class="kpi__note">Benign lesions correctly left unflagged</p></div>
+    </div>
+
+    <div class="charts">
+      <figure class="chart-card reveal">
+        <figcaption><h3>Recall by lesion type</h3><p>Share of each type the model identified correctly</p></figcaption>
+        <ul class="hbars" id="recallChart"></ul>
+      </figure>
+      <figure class="chart-card reveal">
+        <figcaption><h3>Where it gets confused</h3><p>Rows: true type · columns: predicted · share of each row</p></figcaption>
+        <div class="cm" id="confusion"></div>
+        <div class="cm__legend"><span>0%</span><i></i><span>100%</span></div>
+      </figure>
+      <figure class="chart-card chart-card--wide reveal">
+        <figcaption><h3>Honest confidence</h3><p>Calibration error: the average gap between stated confidence and actual accuracy</p></figcaption>
+        <div class="calib" id="calib">
+          <div class="calib__row"><span>Before calibration</span><i data-calib="before"></i><b data-calib-val="before">–</b></div>
+          <div class="calib__row is-after"><span>After temperature scaling</span><i data-calib="after"></i><b data-calib-val="after">–</b></div>
+        </div>
+      </figure>
+    </div>
+    <p class="results__foot" id="resultsFoot"></p>
+  </div>
+  <div class="tooltip" id="tooltip" role="tooltip" hidden></div>
+</section>
+
+<!-- SCOPE -->
 <section class="section scope">
   <div class="container">
     <div class="section__head reveal">
-      <p class="eyebrow">Honest by design</p>
+      <p class="eyebrow"><span class="idx">07</span>Honest by design</p>
       <h2>Built for learning,<br><em>not for diagnosis.</em></h2>
     </div>
     <div class="scope__grid">
@@ -258,9 +371,9 @@
         <div class="card__body">
           <h3>What it's good for</h3>
           <ul class="ticks">
-            <li><strong>Learning dermoscopy</strong> See how lesion types differ, and where a network looks.</li>
-            <li><strong>ML research</strong> A reproducible, cross-validated baseline on HAM10000.</li>
-            <li><strong>Teaching uncertainty</strong> Calibrated probabilities show when the model is unsure.</li>
+            <li><strong>Learning dermoscopy</strong>See how lesion types differ, and where a network looks.</li>
+            <li><strong>Machine-learning research</strong>A reproducible, cross-validated baseline on HAM10000.</li>
+            <li><strong>Teaching uncertainty</strong>Calibrated probabilities show when the model is unsure.</li>
           </ul>
         </div>
       </article>
@@ -268,10 +381,10 @@
         <div class="card__body">
           <h3>What it can't do</h3>
           <ul class="ticks ticks--cross">
-            <li><strong>Replace a dermatologist</strong> It has never been clinically validated.</li>
-            <li><strong>Read phone photos</strong> It learned from dermatoscope images only.</li>
-            <li><strong>Cover every skin type</strong> The training images come mostly from fair-skinned patients in Austria and Australia.</li>
-            <li><strong>See what isn't there</strong> Other conditions are forced into one of the seven classes.</li>
+            <li><strong>Replace a dermatologist</strong>It has never been clinically validated.</li>
+            <li><strong>Read phone photos</strong>It learned from dermatoscope images only.</li>
+            <li><strong>Cover every skin type</strong>Training images come mostly from fair-skinned patients in Austria and Australia.</li>
+            <li><strong>See what isn't there</strong>Other conditions are forced into one of the seven classes.</li>
           </ul>
         </div>
       </article>
@@ -279,7 +392,6 @@
   </div>
 </section>
 
-<!-- IMAGE STRIP -->
 <div class="strip" aria-hidden="true">
   <div class="strip__track">
     <img src="assets/strip/1.jpg" alt=""><img src="assets/strip/2.jpg" alt=""><img src="assets/strip/3.jpg" alt=""><img src="assets/strip/4.jpg" alt="">
@@ -293,7 +405,7 @@
 <section class="section faq" id="faq">
   <div class="container faq__grid">
     <div class="faq__aside reveal">
-      <p class="eyebrow">Quick answers</p>
+      <p class="eyebrow"><span class="idx">08</span>Quick answers</p>
       <h2>Questions,<br><em>answered.</em></h2>
       <img src="assets/lesions/vasc.jpg" alt="Dermoscopy image of a vascular lesion">
     </div>
@@ -312,7 +424,7 @@
       </details>
       <details>
         <summary>Which network is it?</summary>
-        <p>An ensemble of five ImageNet-pretrained convolutional networks fine-tuned with a class-weighted loss. Each one held out a different fifth of the data, and their predictions are averaged over eight rotations and mirrorings of the image.</p>
+        <p>An ensemble of ImageNet-pretrained EfficientNet networks fine-tuned with a class-weighted loss. Each one held out a different fifth of the data, and their predictions are averaged over rotated and mirrored views of the image.</p>
       </details>
       <details>
         <summary>Is my image stored?</summary>
@@ -320,7 +432,7 @@
       </details>
       <details>
         <summary>Why does it sometimes confuse melanoma and moles?</summary>
-        <p>Some melanomas and benign nevi look very similar, even to experts. The data is also imbalanced: two-thirds of the images are nevi. Class weighting helps, but this remains the hardest distinction and the reason the score is a probability rather than a verdict.</p>
+        <p>Some melanomas and benign nevi look very similar, even to experts. The data is also imbalanced: two-thirds of the images are nevi. Class weighting helps, but this remains the hardest distinction, which is why the result is a probability rather than a verdict.</p>
       </details>
     </div>
   </div>
@@ -333,8 +445,12 @@
   </video>
   <div class="cta__shade"></div>
   <div class="container cta__inner reveal">
+    <p class="eyebrow eyebrow--light">Ready when you are</p>
     <h2>Curious what the network sees?</h2>
-    <a class="btn btn--pill btn--light" href="#analyze">Analyse an image <span class="btn__arrow" aria-hidden="true">→</span></a>
+    <div class="cta__buttons">
+      <a class="btn btn--pill btn--light" href="#analyze">Analyse an image <span class="btn__arrow"><svg><use href="#i-arrow"/></svg></span></a>
+      <a class="btn btn--pill btn--outline" href="#results">See the results</a>
+    </div>
   </div>
 </section>
 </main>
@@ -344,10 +460,11 @@
     <div>
       <a class="wordmark wordmark--light" href="#top"><span class="wordmark__dot"></span>SkinDetect</a>
       <p class="footer__tag">Seven-class skin lesion classification from dermoscopy images. A machine-learning research project.</p>
+      <a class="btn btn--pill btn--outline btn--sm" href="https://github.com/ayushswamy30/SkinDetect" rel="noopener">Source code <span class="btn__arrow"><svg><use href="#i-arrow"/></svg></span></a>
     </div>
     <div>
       <p class="footer__h">Explore</p>
-      <a href="#analyze">Analyser</a><a href="#lesions">Lesion types</a><a href="#how">How it works</a><a href="#performance">Performance</a><a href="#faq">FAQ</a>
+      <a href="#analyze">Analyser</a><a href="#lesions">Lesion types</a><a href="#how">How it works</a><a href="#results">Results</a><a href="#faq">FAQ</a>
     </div>
     <div>
       <p class="footer__h">Data &amp; credits</p>
@@ -359,7 +476,7 @@
       <p>Not a medical device. Not for diagnosis or treatment decisions. If you're concerned about a skin lesion, see a doctor.</p>
     </div>
   </div>
-  <div class="container footer__base"><span>© <span id="year">2026</span> SkinDetect</span><span>Research use only</span></div>
+  <div class="container footer__base"><span>© <span id="year">2026</span> SkinDetect</span><span>Research use only · non-commercial</span></div>
 </footer>
 
 <script src="app.js" defer></script>

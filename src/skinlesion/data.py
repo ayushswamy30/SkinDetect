@@ -1,8 +1,12 @@
 """Paths, class definitions and metadata loading shared across the project."""
 
-from pathlib import Path
+from __future__ import annotations
 
-import pandas as pd
+from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:  # pandas is imported lazily so the web server can use the class lists without it
+    import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[2]
 RAW_DIR = ROOT / "data" / "raw"
@@ -38,6 +42,8 @@ def resized_image_dir(image_dir: Path, short_side: int | None) -> Path:
 
 def load_metadata() -> pd.DataFrame:
     """HAM10000 training metadata with image paths and integer labels."""
+    import pandas as pd
+
     df = pd.read_csv(RAW_DIR / "HAM10000_metadata.csv")
     df["path"] = df.image_id.map(lambda i: str(TRAIN_IMAGE_DIR / f"{i}.jpg"))
     df["label"] = df.dx.map(CLASS_TO_IDX)
@@ -46,6 +52,8 @@ def load_metadata() -> pd.DataFrame:
 
 def load_test_metadata() -> pd.DataFrame:
     """ISIC 2018 Task 3 test ground truth, restricted to images that exist on disk."""
+    import pandas as pd
+
     df = pd.read_csv(RAW_DIR / "ISIC2018_Task3_Test_GroundTruth.csv")
     df["path"] = df.image_id.map(lambda i: str(TEST_IMAGE_DIR / f"{i}.jpg"))
     df["label"] = df.dx.map(CLASS_TO_IDX)

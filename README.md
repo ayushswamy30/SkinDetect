@@ -1,0 +1,7 @@
+# SkinDetect: deployment branch
+
+Generated from the main branches for serving only: the website (`web/`), the API, the
+PyTorch-free predictor (`src/skinlesion/serving.py`) and the ONNX fold ensemble (`models/onnx/`).
+Run with `pip install -r requirements.txt && PYTHONPATH=src python app.py --host 0.0.0.0 --port 7860`.
+
+Research demo, not a medical device. Model trained on HAM10000 (CC BY-NC 4.0).

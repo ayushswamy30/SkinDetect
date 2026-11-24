@@ -1,0 +1,58 @@
+{
+  "classes": [
+    "akiec",
+    "bcc",
+    "bkl",
+    "df",
+    "mel",
+    "nv",
+    "vasc"
+  ],
+  "files": [
+    "fold0.onnx",
+    "fold1.onnx",
+    "fold2.onnx"
+  ],
+  "model_name": "efficientnet_b0",
+  "img_size": 224,
+  "cache_short_side": 300,
+  "temperature": 1.8200976873845676,
+  "metadata": {
+    "name": "baseline",
+    "folds": {
+      "0": "baseline_fold0_20261119-004936",
+      "1": "baseline_fold1_20261124-182744",
+      "2": "baseline_fold2_20261124-185447"
+    },
+    "exported": "2026-11-24T19:56:03",
+    "oof": {
+      "balanced_acc": 0.7526126619763638,
+      "acc": 0.8304492512479201,
+      "macro_f1": 0.7450069276544611,
+      "macro_auc": 0.9718368388491935,
+      "recall_akiec": 0.45685279187817257,
+      "recall_bcc": 0.8084415584415584,
+      "recall_bkl": 0.8,
+      "recall_df": 0.6956521739130435,
+      "recall_mel": 0.7271364317841079,
+      "recall_nv": 0.8732289336316182,
+      "recall_vasc": 0.9069767441860465,
+      "malignant_sensitivity": 0.7627986348122867,
+      "malignant_specificity": 0.9024390243902439,
+      "malignant_auc": 0.9303469969679738
+    },
+    "test": null,
+    "calibration": {
+      "temperature": 1.8200976873845676,
+      "tta_views": 8,
+      "oof_before": {
+        "nll": 0.5332566499710083,
+        "ece": 0.0679967047073282
+      },
+      "oof_after": {
+        "nll": 0.4505347013473511,
+        "ece": 0.011277538999146521
+      }
+    }
+  }
+}

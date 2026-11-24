@@ -1,0 +1,7 @@
+# Only src/, web/, app.py and models/onnx/ go into the image
+*
+!src/
+!web/
+!app.py
+!models/onnx/
+**/__pycache__

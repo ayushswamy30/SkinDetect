@@ -17,3 +17,6 @@ outputs/
 # Secrets
 kaggle.json
 .env
+
+# Exported model bundles (scripts/export_model.py); published with the deployment, not in git
+models/

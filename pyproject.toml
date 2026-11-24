@@ -18,6 +18,13 @@ dependencies = [
     "ipykernel",
 ]
 
+[project.optional-dependencies]
+app = [
+    "fastapi>=0.115",
+    "python-multipart>=0.0.9",
+    "uvicorn>=0.30",
+]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

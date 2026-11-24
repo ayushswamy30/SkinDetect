@@ -41,6 +41,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--name", required=True)
     parser.add_argument("--out", type=Path, default=DEFAULT_BUNDLE)
+    parser.add_argument("--temperature", type=float,
+                        help="override the fitted temperature. The fit uses single-model out-of-fold predictions; "
+                             "averaging the fold ensemble already removes much of that over-confidence")
     args = parser.parse_args()
 
     runs = find_runs(OUTPUTS_DIR / "runs", args.name)
@@ -67,10 +70,12 @@ def main() -> None:
         "calibration": calibration,
         **oof_summary(eval_dir, calibration["tta_views"]),
     }
-    save_bundle(args.out, models, cfg["model"], cfg["data"], calibration["temperature"], metadata)
+    temperature = calibration["temperature"] if args.temperature is None else args.temperature
+    metadata["temperature_source"] = "fitted on out-of-fold predictions" if args.temperature is None else "set manually"
+    save_bundle(args.out, models, cfg["model"], cfg["data"], temperature, metadata)
     size = args.out.stat().st_size / 2**20
     print(f"Saved {len(models)} x {cfg['model']['name']} to {args.out} ({size:.1f} MB), "
-          f"temperature {calibration['temperature']:.3f}")
+          f"temperature {temperature:.3f}")
 
 
 if __name__ == "__main__":

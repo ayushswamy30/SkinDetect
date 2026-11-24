@@ -101,6 +101,11 @@ def model_info() -> dict:
         "temperature": p.temperature,
         "cv": meta.get("oof"),
         "test": meta.get("test"),
+        "per_class": meta.get("per_class"),
+        "confusion": meta.get("confusion"),
+        "n_images": meta.get("n_images"),
+        "n_folds": meta.get("n_folds"),
+        "calibration": {k: meta.get("calibration", {}).get(k) for k in ("oof_before", "oof_after")},
         "classes": [{"code": c, "name": CLASS_NAMES[c], "malignant": c in MALIGNANT} for c in CLASSES],
     }
 

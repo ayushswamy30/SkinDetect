@@ -20,6 +20,23 @@ from skinlesion.evaluation import find_runs, load_model
 from skinlesion.inference import DEFAULT_BUNDLE, save_bundle
 
 
+def oof_summary(eval_dir: Path, tta_views: int) -> dict:
+    """Per-class report and confusion matrix of the out-of-fold predictions, for the website's charts."""
+    import pandas as pd
+    from sklearn.metrics import confusion_matrix
+
+    from skinlesion.data import CLASSES
+    from skinlesion.evaluation import PROB_COLUMNS, per_class_report
+
+    path = eval_dir / (f"oof_tta{tta_views}_preds.csv" if tta_views > 1 else "oof_preds.csv")
+    preds = pd.read_csv(path)
+    labels, probs = preds.label.to_numpy(), preds[PROB_COLUMNS].to_numpy()
+    report = per_class_report(labels, probs).round(4)
+    return {"per_class": report.to_dict(orient="records"),
+            "confusion": confusion_matrix(labels, probs.argmax(1), labels=list(range(len(CLASSES)))).tolist(),
+            "n_images": int(len(preds)), "n_folds": int(preds.fold.nunique())}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--name", required=True)
@@ -48,6 +65,7 @@ def main() -> None:
         "oof": metrics.get("oof_tta", metrics["oof"]),
         "test": metrics.get("test"),
         "calibration": calibration,
+        **oof_summary(eval_dir, calibration["tta_views"]),
     }
     save_bundle(args.out, models, cfg["model"], cfg["data"], calibration["temperature"], metadata)
     size = args.out.stat().st_size / 2**20

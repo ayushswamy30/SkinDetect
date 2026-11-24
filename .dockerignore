@@ -1,7 +1,7 @@
-# Only src/, web/, app.py and models/skinlesion.pt go into the image
+# Only src/, web/, app.py and models/onnx/ go into the image
 *
 !src/
 !web/
 !app.py
-!models/skinlesion.pt
+!models/onnx/
 **/__pycache__

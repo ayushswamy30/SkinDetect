@@ -4,7 +4,6 @@ A bundle (written by scripts/export_model.py) holds every fold's weights in floa
 reproduce evaluation preprocessing, so the app and CLI need neither the training runs nor the dataset.
 """
 
-from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
@@ -12,10 +11,11 @@ import torch
 from PIL import Image
 from torch import nn
 
-from skinlesion.data import CLASS_NAMES, CLASSES, MALIGNANT, ROOT
+from skinlesion.data import CLASSES, ROOT
 from skinlesion.dataset import build_transforms
 from skinlesion.engine import autocast, build_model
-from skinlesion.evaluation import MALIGNANT_IDX, dihedral_views
+from skinlesion.evaluation import dihedral_views
+from skinlesion.serving import Prediction, calibrated_prediction, overlay_heatmap  # noqa: F401 (re-exported)
 
 DEFAULT_BUNDLE = ROOT / "models" / "skinlesion.pt"
 
@@ -35,21 +35,6 @@ def save_bundle(path: Path, models: list[nn.Module], model_cfg: dict, data_cfg: 
                         for m in models],
         "metadata": metadata,
     }, path)
-
-
-@dataclass
-class Prediction:
-    probs: dict[str, float]  # calibrated class probabilities, in CLASSES order
-    top_class: str
-    malignant_prob: float    # P(akiec) + P(bcc) + P(mel)
-
-    @property
-    def top_name(self) -> str:
-        return CLASS_NAMES[self.top_class]
-
-    @property
-    def top_is_malignant(self) -> bool:
-        return self.top_class in MALIGNANT
 
 
 class Predictor:
@@ -117,10 +102,12 @@ class Predictor:
                 probs += model(views).float().softmax(1).sum(0, keepdim=True)
         probs = probs / (self.tta_views * len(self.models))
         # temperature scaling on the averaged probabilities, as fitted in scripts/evaluate.py
-        logits = probs.clamp_min(1e-12).log() / self.temperature
-        p = logits.softmax(1)[0].cpu().numpy()
-        return Prediction(probs=dict(zip(CLASSES, p.tolist())), top_class=CLASSES[int(p.argmax())],
-                          malignant_prob=float(p[MALIGNANT_IDX].sum()))
+        return calibrated_prediction(probs[0].double().cpu().numpy(), self.temperature)
+
+    def analyze(self, image: Image.Image) -> tuple[Prediction, np.ndarray, np.ndarray]:
+        """Prediction, the model's input crop and the Grad-CAM of the predicted class (same API as OnnxPredictor)."""
+        pred = self.predict(image)
+        return pred, self.model_input_image(image), self.gradcam(image, CLASSES.index(pred.top_class))
 
     def gradcam(self, image: Image.Image, class_idx: int | None = None, max_models: int = 2) -> np.ndarray:
         """Grad-CAM for `class_idx` (default: the predicted class), averaged over the first `max_models` models.
@@ -148,11 +135,3 @@ class Predictor:
         cam = torch.stack(cams).mean(0)
         return (cam / cam.max().clamp_min(1e-8)).cpu().numpy()
 
-
-def overlay_heatmap(image: np.ndarray, cam: np.ndarray, alpha: float = 0.45) -> np.ndarray:
-    """Blend a [0, 1] heatmap (jet colour map) onto a uint8 HxWx3 image."""
-    import matplotlib
-
-    colours = matplotlib.colormaps["jet"](cam)[..., :3]
-    blended = (1 - alpha) * image / 255.0 + alpha * colours
-    return (blended.clip(0, 1) * 255).astype(np.uint8)

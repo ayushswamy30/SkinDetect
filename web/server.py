@@ -5,6 +5,9 @@
     POST /api/analyze   multipart form field `image` -> calibrated probabilities, malignancy score, Grad-CAM
     GET  /api/health    liveness check
 
+Two backends, chosen by SKINDETECT_BUNDLE: a directory from scripts/export_onnx.py runs on ONNX Runtime
+(no PyTorch needed, used for deployment); a .pt file from scripts/export_model.py runs on PyTorch.
+
 Research and education only. Not a medical device.
 """
 
@@ -16,15 +19,14 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 import numpy as np
-import torch
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.concurrency import run_in_threadpool
 from PIL import Image, UnidentifiedImageError
 
-from skinlesion.data import CLASS_NAMES, CLASSES, MALIGNANT
-from skinlesion.inference import DEFAULT_BUNDLE, Predictor, overlay_heatmap
+from skinlesion.data import CLASS_NAMES, CLASSES, MALIGNANT, ROOT
+from skinlesion.serving import overlay_heatmap
 
 STATIC = Path(__file__).resolve().parent / "static"
 MAX_UPLOAD_BYTES = 15 * 2**20
@@ -34,14 +36,32 @@ state: dict = {}
 _inference_lock = threading.Lock()  # one image at a time keeps CPU and memory use predictable
 
 
+def load_predictor():
+    """ONNX model directory if present (or named by SKINDETECT_BUNDLE), else the PyTorch bundle."""
+    tta = int(os.environ.get("SKINDETECT_TTA", "8"))
+    default = ROOT / "models" / "onnx"
+    if not (default / "meta.json").exists():
+        default = ROOT / "models" / "skinlesion.pt"
+    bundle = Path(os.environ.get("SKINDETECT_BUNDLE", default))
+    if not bundle.is_absolute():
+        bundle = ROOT / bundle
+    if bundle.is_dir():
+        from skinlesion.serving import OnnxPredictor
+
+        threads = os.environ.get("SKINDETECT_THREADS")
+        return OnnxPredictor(bundle, tta_views=tta, threads=int(threads) if threads else None)
+    import torch
+
+    from skinlesion.inference import Predictor
+
+    device = os.environ.get("SKINDETECT_DEVICE")  # e.g. "cpu"; default: CUDA when available
+    return Predictor.from_bundle(bundle, tta_views=tta, device=torch.device(device) if device else None)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    bundle = Path(os.environ.get("SKINDETECT_BUNDLE", DEFAULT_BUNDLE))
-    tta = int(os.environ.get("SKINDETECT_TTA", "8"))
-    device = os.environ.get("SKINDETECT_DEVICE")  # e.g. "cpu"; default: CUDA when available
     try:
-        state["predictor"] = Predictor.from_bundle(bundle, tta_views=tta,
-                                                   device=torch.device(device) if device else None)
+        state["predictor"] = load_predictor()
     except FileNotFoundError as e:
         state["error"] = str(e)  # serve the site anyway; the analyzer shows the error
     yield
@@ -51,7 +71,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="SkinDetect", lifespan=lifespan, docs_url=None, redoc_url=None)
 
 
-def predictor() -> Predictor:
+def predictor():
     if "predictor" not in state:
         raise HTTPException(503, state.get("error", "model not loaded"))
     return state["predictor"]
@@ -100,8 +120,7 @@ async def analyze(image: UploadFile = File(...)) -> dict:
 
     def run():
         with _inference_lock:
-            pred = p.predict(img)
-            return pred, p.model_input_image(img), p.gradcam(img, CLASSES.index(pred.top_class))
+            return p.analyze(img)
 
     pred, crop, cam = await run_in_threadpool(run)  # keep the event loop free while the model runs
     ranked = sorted(pred.probs.items(), key=lambda kv: kv[1], reverse=True)

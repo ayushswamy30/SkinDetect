@@ -1,6 +1,6 @@
 """Publish the website and model to a Hugging Face Docker Space (free CPU tier is enough).
 
-Uploads the Dockerfile, src/, web/, app.py and the model bundle, with a Space card; Hugging Face builds and
+Uploads the Dockerfile, src/, web/, app.py and the ONNX models (scripts/export_onnx.py), with a Space card; Hugging Face builds and
 serves the container. Needs a Hugging Face account and a write token:
     uv run hf auth login        (or set HF_TOKEN)
 
@@ -17,7 +17,6 @@ from pathlib import Path
 from huggingface_hub import HfApi
 
 from skinlesion.data import ROOT
-from skinlesion.inference import DEFAULT_BUNDLE
 
 SPACE_CARD = """---
 title: SkinDetect
@@ -42,11 +41,11 @@ ensemble of convolutional networks, and shows a Grad-CAM heatmap of what drove t
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--repo", required=True, help="<username>/<space-name>")
-    parser.add_argument("--bundle", type=Path, default=DEFAULT_BUNDLE)
+    parser.add_argument("--models", type=Path, default=ROOT / "models" / "onnx")
     parser.add_argument("--private", action="store_true")
     args = parser.parse_args()
-    if not args.bundle.exists():
-        raise SystemExit(f"{args.bundle} not found; run scripts/export_model.py first")
+    if not (args.models / "meta.json").exists():
+        raise SystemExit(f"{args.models} has no meta.json; run scripts/export_onnx.py first")
 
     with tempfile.TemporaryDirectory() as tmp:
         stage = Path(tmp)
@@ -55,14 +54,13 @@ def main() -> None:
         ignore = shutil.ignore_patterns("__pycache__", "*.pyc")
         shutil.copytree(ROOT / "src", stage / "src", ignore=ignore)
         shutil.copytree(ROOT / "web", stage / "web", ignore=ignore)
-        (stage / "models").mkdir()
-        shutil.copy2(args.bundle, stage / "models" / "skinlesion.pt")
+        shutil.copytree(args.models, stage / "models" / "onnx")
         (stage / "README.md").write_text(SPACE_CARD, encoding="utf-8")
 
         api = HfApi()
         api.create_repo(args.repo, repo_type="space", space_sdk="docker", private=args.private, exist_ok=True)
         api.upload_folder(repo_id=args.repo, repo_type="space", folder_path=stage,
-                          commit_message="Deploy SkinDetect", delete_patterns=["src/**", "web/**"])
+                          commit_message="Deploy SkinDetect", delete_patterns=["src/**", "web/**", "models/**"])
     host = args.repo.replace("/", "-").replace("_", "-").replace(".", "-").lower()
     print(f"Uploaded. Build logs: https://huggingface.co/spaces/{args.repo}\n"
           f"App URL once built: https://{host}.hf.space")

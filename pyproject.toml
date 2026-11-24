@@ -21,6 +21,7 @@ dependencies = [
 [project.optional-dependencies]
 app = [
     "fastapi>=0.115",
+    "onnxruntime>=1.20",
     "python-multipart>=0.0.9",
     "uvicorn>=0.30",
 ]
@@ -45,6 +46,8 @@ explicit = true
 [dependency-groups]
 dev = [
     "httpx>=0.28.1",
+    "onnx>=1.23.2",
+    "onnxscript>=0.7.2",
     "pytest>=9.2.0",
 ]
 

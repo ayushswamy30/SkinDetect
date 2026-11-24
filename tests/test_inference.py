@@ -84,3 +84,35 @@ def test_web_api(bundle, image, monkeypatch):
         assert bad.status_code == 415
         assert client.get("/").status_code == 200
         assert client.get("/styles.css").status_code == 200
+
+
+def test_onnx_export_matches_torch(bundle, image, tmp_path):
+    pytest.importorskip("onnxruntime")
+    pytest.importorskip("onnx")
+    import json
+    import sys
+    from pathlib import Path
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+    from export_onnx import LogitsAndCams
+
+    from skinlesion.serving import OnnxPredictor
+
+    torch_pred = Predictor.from_bundle(bundle, tta_views=2, device=torch.device("cpu"))
+    files = []
+    for k, model in enumerate(torch_pred.models):
+        torch.onnx.export(LogitsAndCams(model).eval(), (torch.zeros(1, 3, 64, 64),), tmp_path / f"f{k}.onnx",
+                          input_names=["image"], output_names=["logits", "cams"],
+                          dynamic_axes={"image": {0: "n"}, "logits": {0: "n"}, "cams": {0: "n"}},
+                          opset_version=17, dynamo=False)
+        files.append(f"f{k}.onnx")
+    (tmp_path / "meta.json").write_text(json.dumps({
+        "classes": CLASSES, "files": files, "model_name": "resnet18", "img_size": 64, "cache_short_side": 80,
+        "temperature": torch_pred.temperature, "metadata": {"name": "test"}}))
+    onnx_pred = OnnxPredictor(tmp_path, tta_views=2)
+    a = torch_pred.predict(image)
+    b, crop, cam = onnx_pred.analyze(image)
+    assert max(abs(a.probs[c] - b.probs[c]) for c in CLASSES) < 2e-3
+    assert crop.shape == (64, 64, 3) and cam.shape == (64, 64)
+    cam_t = torch_pred.gradcam(image, CLASSES.index(a.top_class), max_models=2)
+    assert np.corrcoef(cam_t.ravel(), cam.ravel())[0, 1] > 0.95  # CAM == Grad-CAM for avg-pool + linear heads

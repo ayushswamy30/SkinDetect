@@ -225,9 +225,11 @@ function buildCharts(m) {
 
   // Calibration before/after
   const cal = m.calibration || {};
-  if (cal.oof_before && cal.oof_after) {
-    const max = Math.max(cal.oof_before.ece, cal.oof_after.ece, 0.01);
-    [["before", cal.oof_before.ece], ["after", cal.oof_after.ece]].forEach(([k, v]) => {
+  const after = cal.test_before || cal.oof_after;  // the deployed ensemble on held-out data, else the scaled OOF
+  if (cal.oof_before && after) {
+    if (!cal.test_before) $('[data-calib="after"]').previousElementSibling.textContent = "After temperature scaling";
+    const max = Math.max(cal.oof_before.ece, after.ece, 0.01);
+    [["before", cal.oof_before.ece], ["after", after.ece]].forEach(([k, v]) => {
       $(`[data-calib="${k}"]`).dataset.w = (v / max).toFixed(4);
       $(`[data-calib-val="${k}"]`).textContent = pct(v, 1);
     });
@@ -237,7 +239,7 @@ function buildCharts(m) {
   if (m.n_images && m.n_folds) {
     $("#resultsNote").textContent = `Pooled validation predictions on ${m.n_images.toLocaleString()} images across ${m.n_folds} cross-validation folds, split by lesion so the same mole never appears in both training and validation.`;
   }
-  let foot = `Model: ${m.ensemble_size} × ${m.backbone} at ${m.img_size}px, calibrated with temperature ${m.temperature.toFixed(2)}; the live demo averages ${m.tta_views} view${m.tta_views > 1 ? "s" : ""} per image.`;
+  let foot = `Model: ${m.ensemble_size} × ${m.backbone} at ${m.img_size}px, temperature ${m.temperature.toFixed(2)}; the live demo averages ${m.tta_views} view${m.tta_views > 1 ? "s" : ""} per image.`;
   if (m.test) foot += ` Held-out ISIC 2018 test set: balanced accuracy ${pct(m.test.balanced_acc, 1)}, macro AUC ${m.test.macro_auc.toFixed(3)}.`;
   $("#resultsFoot").textContent = foot;
 }

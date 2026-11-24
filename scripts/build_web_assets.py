@@ -2,7 +2,6 @@
 
 Writes to web/static/assets/:
   lesions/<class>.jpg      one example per class for the lesion-type cards
-  strip/<n>.jpg            square crops for the scrolling image strip
   video/hero.mp4 (+ .jpg)  slow zooms and crossfades through eight lesions, for the hero background
   video/macro.mp4 (+ .jpg) a slow push-in on two lesions, for the closing call-to-action band
 
@@ -30,8 +29,6 @@ CLASS_EXAMPLES = {
 HERO_SEQUENCE = ["ISIC_0033848", "ISIC_0025879", "ISIC_0024662", "ISIC_0033426", "ISIC_0026758",
                  "ISIC_0027631", "ISIC_0031874", "ISIC_0032774"]
 MACRO_SEQUENCE = ["ISIC_0033569", "ISIC_0024967"]
-STRIP = ["ISIC_0033426", "ISIC_0024475", "ISIC_0025879", "ISIC_0032393", "ISIC_0029391", "ISIC_0027613",
-         "ISIC_0034048", "ISIC_0033855"]
 
 
 def source(image_id: str) -> Path:
@@ -41,12 +38,6 @@ def source(image_id: str) -> Path:
 def save_jpeg(image: Image.Image, path: Path, quality: int = 82) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     image.save(path, quality=quality, optimize=True, progressive=True)
-
-
-def square(image: Image.Image, size: int) -> Image.Image:
-    s = min(image.size)
-    left, top = (image.width - s) // 2, (image.height - s) // 2
-    return image.crop((left, top, left + s, top + s)).resize((size, size), Image.Resampling.LANCZOS)
 
 
 def zoom_video(ffmpeg: str, images: list[str], out: Path, seconds: float, fade: float, zoom_to: float,
@@ -84,9 +75,6 @@ def main() -> None:
     for cls, image_id in CLASS_EXAMPLES.items():
         with Image.open(source(image_id)) as im:
             save_jpeg(im.convert("RGB"), ASSETS / "lesions" / f"{cls}.jpg")
-    for n, image_id in enumerate(STRIP, 1):
-        with Image.open(source(image_id)) as im:
-            save_jpeg(square(im.convert("RGB"), 420), ASSETS / "strip" / f"{n}.jpg")
 
     zoom_video(ffmpeg, HERO_SEQUENCE, ASSETS / "video" / "hero.mp4", seconds=4.5, fade=1.2, zoom_to=1.18)
     zoom_video(ffmpeg, MACRO_SEQUENCE, ASSETS / "video" / "macro.mp4", seconds=7, fade=2, zoom_to=1.35)

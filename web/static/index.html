@@ -257,7 +257,7 @@
       <ol class="steps" id="steps">
         <li class="is-active"><button type="button"><span class="steps__n">01</span><span><strong>Standardise</strong><small>The image is scaled and centre-cropped exactly as the training images were.</small></span></button></li>
         <li><button type="button"><span class="steps__n">02</span><span><strong>Look several ways</strong><small>Lesions have no "up", so the image is rotated and mirrored into several views.</small></span></button></li>
-        <li><button type="button"><span class="steps__n">03</span><span><strong>Vote and calibrate</strong><small>Networks trained on different slices of the data average their answers; temperature scaling turns scores into honest probabilities.</small></span></button></li>
+        <li><button type="button"><span class="steps__n">03</span><span><strong>Vote and calibrate</strong><small>Networks trained on different slices of the data average their answers, which also tempers any one network's over-confidence.</small></span></button></li>
         <li><button type="button"><span class="steps__n">04</span><span><strong>Explain</strong><small>Grad-CAM traces the prediction back to the regions of the image that drove it.</small></span></button></li>
       </ol>
     </div>
@@ -346,10 +346,10 @@
         <div class="cm__legend"><span>0%</span><i></i><span>100%</span></div>
       </figure>
       <figure class="chart-card chart-card--wide reveal">
-        <figcaption><h3>Honest confidence</h3><p>Calibration error: the average gap between stated confidence and actual accuracy</p></figcaption>
+        <figcaption><h3>Honest confidence</h3><p>Calibration error: the average gap between stated confidence and actual accuracy. One network alone is over-confident; averaging five fixes most of it.</p></figcaption>
         <div class="calib" id="calib">
-          <div class="calib__row"><span>Before calibration</span><i data-calib="before"></i><b data-calib-val="before">–</b></div>
-          <div class="calib__row is-after"><span>After temperature scaling</span><i data-calib="after"></i><b data-calib-val="after">–</b></div>
+          <div class="calib__row"><span>One network (validation)</span><i data-calib="before"></i><b data-calib-val="before">–</b></div>
+          <div class="calib__row is-after"><span>Five-network ensemble (test set)</span><i data-calib="after"></i><b data-calib-val="after">–</b></div>
         </div>
       </figure>
     </div>

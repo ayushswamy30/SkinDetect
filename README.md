@@ -30,18 +30,34 @@ that drove the prediction.
 ## Results
 
 <!-- RESULTS:START -->
-Five-fold cross-validation, split by lesion so that no lesion appears in both training and validation.
-Out-of-fold numbers pool the validation predictions of all five folds (10,015 images).
+**Final model:** five EfficientNet-B0 networks (one per fold, 224px), averaged over 8 rotations/flips.
 
-| Model | Balanced acc. | Accuracy | Macro F1 | Macro AUC | Malignant sens. / spec. |
-|---|---|---|---|---|---|
-| Baseline, EfficientNet-B0 224px | 0.754 | 0.823 | 0.736 | 0.967 | 0.762 / 0.898 |
+| Evaluation | Images | Balanced acc. | Accuracy | Macro F1 | Macro AUC | Malignant sens. / spec. |
+|---|---|---|---|---|---|---|
+| 5-fold cross-validation (out-of-fold, single network per image) | 10,015 | 0.755 | 0.831 | 0.747 | 0.970 | 0.768 / 0.904 |
+| **ISIC 2018 test set** (held out, 5-network ensemble) | 1,511 | **0.752** | **0.839** | **0.773** | **0.972** | **0.818 / 0.913** |
 
-Per fold, balanced accuracy ranges from 0.734 to 0.766. Recall is highest for nevi (0.87) and vascular
-lesions (0.90) and lowest for actinic keratosis (0.49), which is most often mistaken for benign keratosis.
-Temperature scaling (T = 2.26) cuts the expected calibration error from 9.9% to 1.1%.
+Cross-validation is split by lesion, so no lesion appears in both training and validation. The test set
+was used once, for this final evaluation. Test recall by class: nevus 0.90, melanoma 0.78, vascular 0.77,
+basal cell carcinoma 0.76, benign keratosis 0.76, dermatofibroma 0.75, actinic keratosis 0.53 (most often
+mistaken for benign keratosis).
 
-Improvement experiments and the ISIC 2018 test-set result are added when they finish.
+**Experiments** (fold 0 only, so differences under ~0.02 are within noise):
+
+| Variant | Balanced acc. | Macro AUC | Melanoma recall | Verdict |
+|---|---|---|---|---|
+| Baseline: EfficientNet-B0, 224px | 0.734 | 0.971 | 0.72 | kept |
+| B0 at 288px | 0.739 | 0.963 | 0.55 | melanoma recall drops sharply |
+| EfficientNet-B2 at 256px | 0.727 | 0.972 | 0.66 | no gain, ~2.5x the compute |
+
+A run with full inverse-frequency class weights did not complete (the training machine ran out of memory).
+
+**Calibration.** A single network is over-confident: its expected calibration error (ECE) on out-of-fold
+predictions is 7.1%. Temperature scaling fitted on those predictions (T = 1.89) brings it to 1.2%, but the
+deployed model averages five networks, which already removes most of the over-confidence: on the test set the
+raw ensemble's ECE is 3.0%, and applying T = 1.89 on top raises it to 8.9%. The deployed ensemble therefore
+uses T = 1. Note that this choice was made after seeing the test set, so the 3.0% is not a fully unbiased
+estimate; accuracy and AUC are unaffected, since temperature changes neither the predicted class nor rankings.
 <!-- RESULTS:END -->
 
 Balanced accuracy (mean recall over the seven classes) is the ISIC 2018 Task 3 ranking metric. Malignant
@@ -58,8 +74,8 @@ matters for a referral decision.
    and cosine decay, bf16 autocast. The checkpoint with the best validation balanced accuracy is kept.
 3. **Ensemble and TTA:** the five fold models are averaged, each over eight rotations and mirrorings of
    the image.
-4. **Calibration:** the networks are over-confident; one temperature fitted on the out-of-fold
-   predictions fixes that (expected calibration error 9.9% → 1.1% for the baseline).
+4. **Calibration:** single networks are over-confident; averaging the five fold models corrects most of
+   it (see Results). `scripts/evaluate.py` also fits a temperature for single models.
 5. **Explanation:** Grad-CAM on the last convolutional feature map. For EfficientNet's average-pool +
    linear head it equals CAM exactly, so the ONNX export computes the maps inside the graph.
 6. **Serving:** ONNX Runtime behind FastAPI, no PyTorch needed; the website is plain HTML/CSS/JS.

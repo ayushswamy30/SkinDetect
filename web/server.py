@@ -105,7 +105,7 @@ def model_info() -> dict:
         "confusion": meta.get("confusion"),
         "n_images": meta.get("n_images"),
         "n_folds": meta.get("n_folds"),
-        "calibration": {k: meta.get("calibration", {}).get(k) for k in ("oof_before", "oof_after")},
+        "calibration": {k: meta.get("calibration", {}).get(k) for k in ("oof_before", "oof_after", "test_before", "test_after")},
         "classes": [{"code": c, "name": CLASS_NAMES[c], "malignant": c in MALIGNANT} for c in CLASSES],
     }
 
